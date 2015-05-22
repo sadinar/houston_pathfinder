@@ -9,7 +9,7 @@ class TestCharacterClass(unittest.TestCase):
         "get_base_attack_bonus, get_fortitude_save, get_reflex_save, get_will_save"
 
         with self.assertRaisesRegexp(TypeError, expectedMessage):
-            character = CharacterClass()
+            CharacterClass()
 
     def test_get_fast_progression_attack_bonus_uses_fast_bonus(self):
         self.assertEqual(CharacterClass._get_fast_progression_attack_bonus(1), 1)
@@ -25,3 +25,13 @@ class TestCharacterClass(unittest.TestCase):
         self.assertEqual(CharacterClass._get_slow_progression_attack_bonus(1), 0)
         self.assertEqual(CharacterClass._get_slow_progression_attack_bonus(9), 4)
         self.assertEqual(CharacterClass._get_slow_progression_attack_bonus(20), 10)
+
+    def test_get_fast_progression_save_returns_fast_save(self):
+        self.assertEqual(CharacterClass._get_fast_progression_save(1), 2)
+        self.assertEqual(CharacterClass._get_fast_progression_save(9), 6)
+        self.assertEqual(CharacterClass._get_fast_progression_save(20), 12)
+
+    def test_get_slow_progression_save_returns_slow_save(self):
+        self.assertEqual(CharacterClass._get_slow_progression_save(1), 0)
+        self.assertEqual(CharacterClass._get_slow_progression_save(9), 3)
+        self.assertEqual(CharacterClass._get_slow_progression_save(20), 6)
