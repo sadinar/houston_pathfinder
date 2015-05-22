@@ -2,6 +2,7 @@ __author__ = 'John Mullins'
 
 from character_class import CharacterClass
 
+
 class Fighter(CharacterClass):
     def __init__(self, level=1):
         self.level = level
