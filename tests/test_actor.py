@@ -1,4 +1,4 @@
-__author__ = 'John'
+__author__ = 'John Mullins'
 
 import unittest
 from actor import Actor

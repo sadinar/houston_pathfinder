@@ -24,10 +24,3 @@ class Actor:
 
     def get_will_save(self):
         return self.character_class.get_will_save()
-
-# tahlen = Actor('Tahlen')
-# print tahlen.name + '\'s strength is {0:d}'.format(tahlen.base_attributes['Strength'].score)
-# print tahlen.name + '\'s attack bonus is +{0:d}'.format(tahlen.get_attack_bonus(['Strength']))
-# print tahlen.name + '\'s fort save is {0:d}'.format(tahlen.get_fortitude_save())
-# print tahlen.name + '\'s reflex save is {0:d}'.format(tahlen.get_reflex_save())
-# print tahlen.name + '\'s will save is {0:d}'.format(tahlen.get_will_save())

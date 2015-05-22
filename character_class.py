@@ -22,13 +22,21 @@ class CharacterClass:
         pass
 
     @staticmethod
-    def get_fast_progression_attack_bonus(level):
+    def _get_fast_progression_attack_bonus(level):
         return level
 
     @staticmethod
-    def get_fast_progression_save(level):
+    def _get_medium_progression_attack_bonus(level):
+        return level * 3 / 4
+
+    @staticmethod
+    def _get_slow_progression_attack_bonus(level):
+        return level / 2
+
+    @staticmethod
+    def _get_fast_progression_save(level):
         return 2 + level / 2
 
     @staticmethod
-    def get_slow_progression_save(level):
+    def _get_slow_progression_save(level):
         return level / 3
