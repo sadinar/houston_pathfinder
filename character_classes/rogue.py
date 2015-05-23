@@ -2,9 +2,12 @@ __author__ = 'John Mullins'
 
 from character_class import CharacterClass
 
+
 class Rogue(CharacterClass):
-    def __init__(self, level=1):
-        self.level = level
+
+    @property
+    def name(self):
+        return 'Rogue'
 
     def get_base_attack_bonus(self):
         return self._get_medium_progression_attack_bonus(self.level)

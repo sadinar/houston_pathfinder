@@ -2,8 +2,21 @@ __author__ = 'John Mullins'
 
 from abc import ABCMeta, abstractmethod
 
-class CharacterClass:
+
+class CharacterClass(object):
+
     __metaclass__ = ABCMeta
+
+    def __init__(self, level=1):
+        level = int(level)
+        if level < 1 or level > 20:
+            raise ValueError('Character levels must be numbers from 1 to 20')
+        self.level = level
+
+    @property
+    @abstractmethod
+    def name(self):
+        pass
 
     @abstractmethod
     def get_base_attack_bonus(self):

@@ -2,41 +2,43 @@ __author__ = 'John Mullins'
 
 import unittest
 from character_classes.fighter import Fighter
-from character_class import CharacterClass
+from tests.test_character_class import TestCharacterClass
+
 
 class TestFighter(unittest.TestCase):
+
     def test_fighter_has_level(self):
         fighter = Fighter(2)
         self.assertEqual(fighter.level, 2)
 
     def test_fighter_uses_fast_attack_progression(self):
-        fighter = Fighter(1)
-        self.assertEqual(fighter.get_base_attack_bonus(), CharacterClass._get_fast_progression_attack_bonus(1))
-        fighter = Fighter(7)
-        self.assertEqual(fighter.get_base_attack_bonus(), CharacterClass._get_fast_progression_attack_bonus(7))
-        fighter = Fighter(20)
-        self.assertEqual(fighter.get_base_attack_bonus(), CharacterClass._get_fast_progression_attack_bonus(20))
+        for per_level_bonus in TestCharacterClass.get_fast_attack_bonus_per_level():
+            fighter = Fighter(per_level_bonus[0])
+            self.assertEqual(fighter.get_base_attack_bonus(), per_level_bonus[1])
 
     def test_fighter_fortitude_save_uses_fast_progression(self):
-        fighter = Fighter(1)
-        self.assertEqual(fighter.get_fortitude_save(), CharacterClass._get_fast_progression_save(1))
-        fighter = Fighter(8)
-        self.assertEqual(fighter.get_fortitude_save(), CharacterClass._get_fast_progression_save(8))
-        fighter = Fighter(20)
-        self.assertEqual(fighter.get_fortitude_save(), CharacterClass._get_fast_progression_save(20))
+        for per_level_bonus in TestCharacterClass.get_fast_save_per_level():
+            fighter = Fighter(per_level_bonus[0])
+            self.assertEqual(fighter.get_fortitude_save(), per_level_bonus[1])
 
     def test_fighter_reflex_save_uses_slow_progression(self):
-        fighter = Fighter(1)
-        self.assertEqual(fighter.get_reflex_save(), CharacterClass._get_slow_progression_save(1))
-        fighter = Fighter(13)
-        self.assertEqual(fighter.get_reflex_save(), CharacterClass._get_slow_progression_save(13))
-        fighter = Fighter(20)
-        self.assertEqual(fighter.get_reflex_save(), CharacterClass._get_slow_progression_save(20))
+        for per_level_bonus in TestCharacterClass.get_slow_save_per_level():
+            fighter = Fighter(per_level_bonus[0])
+            self.assertEqual(fighter.get_reflex_save(), per_level_bonus[1])
 
     def test_fighter_will_save_uses_slow_progression(self):
-        fighter = Fighter(1)
-        self.assertEqual(fighter.get_will_save(), CharacterClass._get_slow_progression_save(1))
-        fighter = Fighter(3)
-        self.assertEqual(fighter.get_will_save(), CharacterClass._get_slow_progression_save(3))
-        fighter = Fighter(20)
-        self.assertEqual(fighter.get_will_save(), CharacterClass._get_slow_progression_save(20))
+        for per_level_bonus in TestCharacterClass.get_slow_save_per_level():
+            fighter = Fighter(per_level_bonus[0])
+            self.assertEqual(fighter.get_will_save(), per_level_bonus[1])
+
+    def test_fighter_class_named_fighter(self):
+        fighter = Fighter(14)
+        self.assertEqual(fighter.name, 'Fighter')
+
+    def test_fighter_level_below_zero_not_allowed(self):
+        with self.assertRaisesRegexp(ValueError, 'Character levels must be numbers from 1 to 20'):
+            Fighter(0)
+
+    def test_fighter_level_above_twenty_not_allowed(self):
+        with self.assertRaisesRegexp(ValueError, 'Character levels must be numbers from 1 to 20'):
+            Fighter(21)

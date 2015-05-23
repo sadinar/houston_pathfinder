@@ -1,12 +1,17 @@
 __author__ = 'John Mullins'
 
-class Attribute:
+
+class Attribute(object):
 
     STRENGTH = 'Strength'
     CONSTITUTION = 'Constitution'
+    DEXTERITY = 'Dexterity'
+    WISDOM = 'Wisdom'
     ABILITY_SCORE_NAMES = [
         STRENGTH,
-        CONSTITUTION
+        CONSTITUTION,
+        DEXTERITY,
+        WISDOM
     ]
 
     def __init__(self, name, score):
