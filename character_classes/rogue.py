@@ -5,6 +5,8 @@ from character_class import CharacterClass
 
 class Rogue(CharacterClass):
 
+    """Concrete implementation of the Rogue character class"""
+
     @property
     def name(self):
         return 'Rogue'

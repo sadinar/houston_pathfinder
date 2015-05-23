@@ -5,6 +5,8 @@ from character_class import CharacterClass
 
 class Fighter(CharacterClass):
 
+    """Concrete implementation of the Fighter character class"""
+
     @property
     def name(self):
         return 'Fighter'
