@@ -39,7 +39,8 @@ class Attribute(object):
 
     def get_attribute_modifier(self):
         """Returns modifier, a bonus, penalty, or zero, of the ability score"""
+        modifier_value = (self.score - 10) / 2
         return Modifier(
-            (self.score - 10) / 2,
-            self.name + ' ability score of ' + str(self.score)
+            modifier_value,
+            '+' + str(modifier_value) + ', ' + self.name + ' ability score of ' + str(self.score)
         )
