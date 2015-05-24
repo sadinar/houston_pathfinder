@@ -2,6 +2,7 @@ __author__ = 'John Mullins'
 
 from modifier import Modifier
 
+
 class Attribute(object):
 
     """Tracks scores and derived bonuses of character attributes

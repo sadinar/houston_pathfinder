@@ -1,5 +1,6 @@
 __author__ = 'John Mullins'
 
+
 class Modifier(object):
 
     """Provides a means to explain where a modifier came from and treat it as a basic type when appropriate.

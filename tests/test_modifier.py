@@ -3,6 +3,7 @@ __author__ = 'John Mullins'
 import unittest
 from modifier import Modifier
 
+
 class TestModifier(unittest.TestCase):
 
     def test_modifier_has_value(self):
