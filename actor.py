@@ -2,6 +2,8 @@ __author__ = 'John Mullins'
 
 from attribute import Attribute
 from character_class import CharacterClass
+from saving_throw import SavingThrow
+from modifier import Modifier
 
 
 class Actor(object):
@@ -23,7 +25,8 @@ class Actor(object):
 
         Args:
             name (string): Name of the character used for display purposes only
-            attributes (list[Attribute]): List of Attribute objects assigned to the character
+            base_attributes (list[Attribute]): List of Attribute objects assigned to the character. Does not include
+                temporary modifiers of any kind
             character_classes (list[CharacterClass]): List of CharacterClass objects representing the levels and
                 decisions made for character's classes
         """
@@ -39,6 +42,10 @@ class Actor(object):
             if not isinstance(character_class, CharacterClass):
                 raise TypeError('Unable to initialize actor using unknown character class')
             self.character_classes.append(character_class)
+
+        self.fortitude_save = SavingThrow(self, SavingThrow.FORTITUDE)
+        self.reflex_save = SavingThrow(self, SavingThrow.REFLEX)
+        self.will_save = SavingThrow(self, SavingThrow.WILL)
 
     def get_attack_bonus(self, attribute_names):
         """Returns attack bonus, including temporary modifiers, permanent modifiers, and additional attacks. Capable
@@ -88,43 +95,23 @@ class Actor(object):
         return attack_bonus
 
     def get_fortitude_save(self):
-        """ Returns character's fortitude saving throw by combining attribute bonus with bonuses across classes
-
-        Returns:
-            int representing fortitude saving throw
-        """
-        fortitude_save = 0
-        if Attribute.CONSTITUTION in self.base_attributes.keys():
-            fortitude_save += self.base_attributes[Attribute.CONSTITUTION].get_attribute_modifier().value
-        for character_class in self.character_classes:
-            fortitude_save += character_class.get_fortitude_save()
-
-        return fortitude_save
+        return self.fortitude_save.value
 
     def get_reflex_save(self):
-        """ Returns character's reflex saving throw by combining attribute bonus with bonuses across classes
-
-        Returns:
-            int representing reflex saving throw
-        """
-        reflex_save = 0
-        if Attribute.DEXTERITY in self.base_attributes.keys():
-            reflex_save += self.base_attributes[Attribute.DEXTERITY].get_attribute_modifier().value
-        for character_class in self.character_classes:
-            reflex_save += character_class.get_reflex_save()
-
-        return reflex_save
+        return self.reflex_save.value
 
     def get_will_save(self):
-        """ Returns character's will saving throw by combining attribute bonus with bonuses across classes
+        return self.will_save.value
+
+    def get_attribute_modifier(self, attribute_name):
+        """Returns modifier for specified attribute including all temporary and permanent modifiers
+
+        Args:
+            attribute_name (string): Name of the attribute whose modifier will be returned
 
         Returns:
-            int representing will saving throw
+            Modifier object representing total modifier along with full audit trail
         """
-        will_save = 0
-        if Attribute.WISDOM in self.base_attributes.keys():
-            will_save += self.base_attributes[Attribute.WISDOM].get_attribute_modifier().value
-        for character_class in self.character_classes:
-            will_save += character_class.get_will_save()
-
-        return will_save
+        if attribute_name in self.base_attributes:
+            return self.base_attributes[attribute_name].get_attribute_modifier()
+        return Modifier(0, self.name + ' does not have the ' + attribute_name + ' attribute.')

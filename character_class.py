@@ -1,6 +1,7 @@
 __author__ = 'John Mullins'
 
 from abc import ABCMeta, abstractmethod
+from saving_throw import SavingThrow
 
 
 class CharacterClass(object):
@@ -25,24 +26,35 @@ class CharacterClass(object):
     def name(self):
         pass
 
+    def get_saving_throw(self, name):
+        """Returns specified saving throw."""
+        if name not in SavingThrow.SAVING_THROW_NAMES:
+            raise ValueError(name + ' is not a valid saving throw name')
+        if name == SavingThrow.FORTITUDE:
+            return self.get_fortitude_save()
+        if name == SavingThrow.REFLEX:
+            return self.get_reflex_save()
+        if name == SavingThrow.WILL:
+            return self.get_will_save()
+
     @abstractmethod
     def get_base_attack_bonus(self):
-        """Calculates base attack bonus for the class using its level"""
+        """Calculates base attack bonus for the class using its level. Does not include extra attacks or modifiers"""
         pass
 
     @abstractmethod
     def get_fortitude_save(self):
-        """Calculates fortitude saving throw for the class using its level"""
+        """Calculates fortitude saving throw for the class using its level. Does not include modifiers"""
         pass
 
     @abstractmethod
     def get_reflex_save(self):
-        """Calculates reflex saving throw for the class using its level"""
+        """Calculates reflex saving throw for the class using its level. Does not include modifiers"""
         pass
 
     @abstractmethod
     def get_will_save(self):
-        """Calculates will saving throw for the class using its level"""
+        """Calculates will saving throw for the class using its level. Does not include modifiers"""
         pass
 
     @staticmethod
