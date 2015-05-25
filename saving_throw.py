@@ -1,7 +1,6 @@
 __author__ = 'John Mullins'
 
 from abc import ABCMeta, abstractmethod
-from attribute import Attribute
 from modifier import Modifier
 
 
@@ -37,6 +36,7 @@ class SavingThrow(object):
             actor (Actor): Actor whose saving throw is being tracked
         """
         self.actor = actor
+        self.name = ''
         self._set_name()
         self.applicable_attributes = []
         self._add_default_attribute()
