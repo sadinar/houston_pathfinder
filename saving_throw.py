@@ -12,7 +12,7 @@ class SavingThrow(object):
     Attributes:
         actor (Actor): Actor whose saving throw is being tracked
         name (string): Name of the saving throw, chosen only from the list of valid names
-        value (Modifier): Saving throw score with all attributes, class bonuses, and miscellaneous modifiers
+        blah (Modifier): Saving throw score with all attributes, class bonuses, and miscellaneous modifiers
         FORTITUDE (string): Name of fortitude saving throw
         REFLEX (string): Name of reflex saving throw
         WILL (string): Name of will saving throw
@@ -26,7 +26,7 @@ class SavingThrow(object):
 
     def __init__(self, actor, name):
         self.actor = actor
-        self.attributes_with_modifiers = []
+        self.applicable_attributes = []
 
         if name not in self.SAVING_THROW_NAMES:
             raise ValueError(name + ' is not a valid saving throw name')
@@ -49,7 +49,7 @@ class SavingThrow(object):
             class_bonus = character_class.get_saving_throw(self.name)
             total_save.value += class_bonus.value
             total_save.audit_explanation += class_bonus.audit_explanation
-        for attribute in self.attributes_with_modifiers:
+        for attribute in self.applicable_attributes:
             attribute_bonus = self.actor.get_attribute_modifier(attribute)
             total_save.value += attribute_bonus.value
             total_save.audit_explanation += attribute_bonus.audit_explanation
@@ -57,6 +57,6 @@ class SavingThrow(object):
         return total_save
 
     def add_attribute_to_save_modifiers(self, attribute_name):
-        if attribute_name not in self.attributes_with_modifiers:
-            self.attributes_with_modifiers.append(attribute_name)
+        if attribute_name not in self.applicable_attributes:
+            self.applicable_attributes.append(attribute_name)
             self.modifier = self._calculate_save()
