@@ -18,6 +18,10 @@ class Actor(object):
         base_attributes (dict[Attribute]): Dictionary of Attributes indexed by attribute name detailing the
             character's permanent attributes. Permanent attributes include those assigned during creation and through
             addition of character classes, but do not include temporary modifiers
+        fortitude_save (SavingThrow): Provides the actor's fortitude save, including temporary and permanent modifiers,
+            along with audit trail
+        reflex_save (SavingThrow): Same as fortitude_save, but for reflex
+        will_save (SavingThrow): Same as fortitude_save, but for will
     """
 
     def __init__(self, name, attributes, character_classes):

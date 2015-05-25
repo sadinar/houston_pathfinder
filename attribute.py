@@ -29,6 +29,12 @@ class Attribute(object):
     ]
 
     def __init__(self, name, score):
+        """Creates an actor attribute
+
+        Args:
+            name (string): Name of the attribute which must be from the list of valid names
+            score (int): Score for the attribute. May be modified if outside the limits (1 to 45)
+        """
         if name not in self.ABILITY_SCORE_NAMES:
             raise ValueError(name + ' is not a recognized ability score')
         self.name = name
@@ -39,7 +45,7 @@ class Attribute(object):
             self.score = 45
 
     def get_attribute_modifier(self):
-        """Returns modifier, a bonus, penalty, or zero, of the ability score"""
+        """Returns modifier, a bonus, penalty, or zero, of the ability score with audit trail"""
         modifier_value = (self.score - 10) / 2
         return Modifier(
             modifier_value,

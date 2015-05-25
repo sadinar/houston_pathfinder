@@ -139,6 +139,14 @@ class CharacterClass(object):
         return level / 3
 
     def _get_saving_throw_modifier(self, bonus):
+        """Provides a consistent format for reporting saving throw bonus for a class
+
+        Args:
+            bonus(int): Bonus which needs to be represented as a Modifier
+
+        Return:
+            Modifier representing the bonus along with an audit trail
+        """
         return Modifier(
             bonus,
             '{:+d}'.format(bonus) + ', Level ' + str(self.level) + ' ' + self.name + ' class bonus. '
