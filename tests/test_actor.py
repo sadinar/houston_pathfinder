@@ -17,10 +17,10 @@ class TestActor(unittest.TestCase):
         strength = Attribute(Attribute.STRENGTH, 18)
         constitution = Attribute(Attribute.CONSTITUTION, 16)
         actor = Actor('Test Fighter Guy', [strength, constitution], [])
-        self.assertEqual(actor.base_attributes[Attribute.STRENGTH].score, 18)
-        self.assertEqual(actor.base_attributes[Attribute.STRENGTH].name, 'Strength')
-        self.assertEqual(actor.base_attributes[Attribute.CONSTITUTION].score, 16)
-        self.assertEqual(actor.base_attributes[Attribute.CONSTITUTION].name, 'Constitution')
+        self.assertEqual(actor._base_attributes[Attribute.STRENGTH].score, 18)
+        self.assertEqual(actor._base_attributes[Attribute.STRENGTH].name, 'Strength')
+        self.assertEqual(actor._base_attributes[Attribute.CONSTITUTION].score, 16)
+        self.assertEqual(actor._base_attributes[Attribute.CONSTITUTION].name, 'Constitution')
 
     def test_get_attack_bonus_requires_list_of_Attributes(self):
         strength = Attribute(Attribute.STRENGTH, 14)
