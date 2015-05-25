@@ -32,7 +32,7 @@ class TestAttribute(unittest.TestCase):
         attribute = Attribute(Attribute.DEXTERITY, 32)
         self.assertEqual(
             attribute.get_attribute_modifier().audit_explanation,
-            '+11, Dexterity ability score of 32'
+            '+11, Dexterity ability score of 32. '
         )
 
     def get_negative_test_attribute_values(self):

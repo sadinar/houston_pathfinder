@@ -43,5 +43,5 @@ class Attribute(object):
         modifier_value = (self.score - 10) / 2
         return Modifier(
             modifier_value,
-            '{:+d}'.format(modifier_value) + ', ' + self.name + ' ability score of ' + str(self.score)
+            '{:+d}'.format(modifier_value) + ', ' + self.name + ' ability score of ' + str(self.score) + '. '
         )

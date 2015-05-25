@@ -2,6 +2,7 @@ __author__ = 'John Mullins'
 
 from abc import ABCMeta, abstractmethod
 from saving_throw import SavingThrow
+from modifier import Modifier
 
 
 class CharacterClass(object):
@@ -44,17 +45,29 @@ class CharacterClass(object):
 
     @abstractmethod
     def get_fortitude_save(self):
-        """Calculates fortitude saving throw for the class using its level. Does not include modifiers"""
+        """Calculates fortitude saving throw for the class using its level. Does not include modifiers
+
+        Return:
+            Modifier object with the class modifier and an explanation of how it was calculated
+        """
         pass
 
     @abstractmethod
     def get_reflex_save(self):
-        """Calculates reflex saving throw for the class using its level. Does not include modifiers"""
+        """Calculates reflex saving throw for the class using its level. Does not include modifiers
+
+        Return:
+            Modifier object with the class modifier and an explanation of how it was calculated
+        """
         pass
 
     @abstractmethod
     def get_will_save(self):
-        """Calculates will saving throw for the class using its level. Does not include modifiers"""
+        """Calculates will saving throw for the class using its level. Does not include modifiers
+
+        Return:
+            Modifier object with the class modifier and an explanation of how it was calculated
+        """
         pass
 
     @staticmethod
@@ -124,3 +137,9 @@ class CharacterClass(object):
             An integer representing save of a slow progression class, such as Fighter's will save, at specified level.
         """
         return level / 3
+
+    def _get_saving_throw_modifier(self, bonus):
+        return Modifier(
+            bonus,
+            '{:+d}'.format(bonus) + ', Level ' + str(self.level) + ' ' + self.name + ' class bonus. '
+        )

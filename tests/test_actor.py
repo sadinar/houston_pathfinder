@@ -51,58 +51,58 @@ class TestActor(unittest.TestCase):
     def test_fortitude_save_includes_constitution_bonus(self):
         constitution = Attribute(Attribute.CONSTITUTION, 19)
         actor = Actor('Test Actor Dude', [constitution], [])
-        self.assertEqual(actor.get_fortitude_save(), constitution.get_attribute_modifier().value)
+        self.assertEqual(actor.get_fortitude_save().value, constitution.get_attribute_modifier().value)
 
     def test_fortitude_save_includes_class_bonus(self):
         fighter = Fighter(14)
         actor = Actor('Test Actor Dude', [], [fighter])
-        self.assertEqual(actor.get_fortitude_save(), fighter.get_fortitude_save())
+        self.assertEqual(actor.get_fortitude_save().value, fighter.get_fortitude_save().value)
 
     def test_fortitude_save_combines_constitution_and_class_bonus(self):
         constitution = Attribute(Attribute.CONSTITUTION, 17)
         rogue = Rogue(19)
         actor = Actor('Test Rogue With Rouge', [constitution], [rogue])
         self.assertEqual(
-            actor.get_fortitude_save(),
-            rogue.get_fortitude_save() + constitution.get_attribute_modifier().value
+            actor.get_fortitude_save().value,
+            rogue.get_fortitude_save().value + constitution.get_attribute_modifier().value
         )
 
     def test_reflex_save_includes_dexterity_bonus(self):
         dexterity = Attribute(Attribute.DEXTERITY, 13)
         actor = Actor('Test Actor Dude', [dexterity], [])
-        self.assertEqual(actor.get_reflex_save(), dexterity.get_attribute_modifier().value)
+        self.assertEqual(actor.get_reflex_save().value, dexterity.get_attribute_modifier().value)
 
     def test_reflex_save_includes_class_bonus(self):
         rogue = Rogue(15)
         actor = Actor('Test Actor Dude', [], [rogue])
-        self.assertEqual(actor.get_reflex_save(), rogue.get_reflex_save())
+        self.assertEqual(actor.get_reflex_save().value, rogue.get_reflex_save().value)
 
     def test_reflex_save_combines_dexterity_and_class_bonus(self):
         dexterity = Attribute(Attribute.DEXTERITY, 13)
         rogue = Rogue(17)
         actor = Actor('Test Rogue With Rouge', [dexterity], [rogue])
         self.assertEqual(
-            actor.get_reflex_save(),
-            rogue.get_reflex_save() + dexterity.get_attribute_modifier().value
+            actor.get_reflex_save().value,
+            rogue.get_reflex_save().value + dexterity.get_attribute_modifier().value
         )
 
     def test_will_save_includes_wisdom_bonus(self):
         wisdom = Attribute(Attribute.WISDOM, 24)
         actor = Actor('Test Actor Dude', [wisdom], [])
-        self.assertEqual(actor.get_will_save(), wisdom.get_attribute_modifier().value)
+        self.assertEqual(actor.get_will_save().value, wisdom.get_attribute_modifier().value)
 
     def test_will_save_includes_class_bonus(self):
         rogue = Rogue(19)
         actor = Actor('Test Actor Dude', [], [rogue])
-        self.assertEqual(actor.get_will_save(), rogue.get_will_save())
+        self.assertEqual(actor.get_will_save().value, rogue.get_will_save().value)
 
     def test_will_save_combines_wisdom_and_class_bonus(self):
         wisdom = Attribute(Attribute.WISDOM, 21)
         rogue = Rogue(20)
         actor = Actor('Test Rogue With Rouge', [wisdom], [rogue])
         self.assertEqual(
-            actor.get_will_save(),
-            rogue.get_will_save() + wisdom.get_attribute_modifier().value
+            actor.get_will_save().value,
+            rogue.get_will_save().value + wisdom.get_attribute_modifier().value
         )
 
     def test_actor_combines_multiple_classes_during_attack_calculation(self):
@@ -112,3 +112,30 @@ class TestActor(unittest.TestCase):
         actor = Actor('Sven', [strength], [fighter, rogue])
         expected_attacks = [16, 11, 6]
         self.assertEqual(actor.get_attack_bonus([Attribute.STRENGTH]), expected_attacks)
+
+    def test_fortitude_save_includes_audit(self):
+        constitution = Attribute(Attribute.CONSTITUTION, 22)
+        rogue = Rogue(1)
+        actor = Actor('Test Rogue With Rouge', [constitution], [rogue])
+        self.assertEqual(
+            actor.get_fortitude_save().audit_explanation,
+            '+0, Level 1 Rogue class bonus. +6, Constitution ability score of 22. '
+        )
+
+    def test_reflex_save_includes_audit(self):
+        dexterity = Attribute(Attribute.DEXTERITY, 23)
+        rogue = Rogue(2)
+        actor = Actor('Test Rogue With Rouge', [dexterity], [rogue])
+        self.assertEqual(
+            actor.get_reflex_save().audit_explanation,
+            '+3, Level 2 Rogue class bonus. +6, Dexterity ability score of 23. '
+        )
+
+    def test_will_save_includes_audit(self):
+        wisdom = Attribute(Attribute.WISDOM, 24)
+        rogue = Rogue(3)
+        actor = Actor('Test Rogue With Rouge', [wisdom], [rogue])
+        self.assertEqual(
+            actor.get_will_save().audit_explanation,
+            '+1, Level 3 Rogue class bonus. +7, Wisdom ability score of 24. '
+        )

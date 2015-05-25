@@ -11,6 +11,6 @@ class Modifier(object):
             audit explanations
     """
 
-    def __init__(self, value, audit_explanation):
+    def __init__(self, value, audit_explanation=''):
         self.value = value
         self.audit_explanation = audit_explanation

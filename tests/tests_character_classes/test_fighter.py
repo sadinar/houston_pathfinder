@@ -19,17 +19,17 @@ class TestFighter(unittest.TestCase):
     def test_fighter_fortitude_save_uses_fast_progression(self):
         for per_level_bonus in TestCharacterClass.get_fast_save_per_level():
             fighter = Fighter(per_level_bonus[0])
-            self.assertEqual(fighter.get_fortitude_save(), per_level_bonus[1])
+            self.assertEqual(fighter.get_fortitude_save().value, per_level_bonus[1])
 
     def test_fighter_reflex_save_uses_slow_progression(self):
         for per_level_bonus in TestCharacterClass.get_slow_save_per_level():
             fighter = Fighter(per_level_bonus[0])
-            self.assertEqual(fighter.get_reflex_save(), per_level_bonus[1])
+            self.assertEqual(fighter.get_reflex_save().value, per_level_bonus[1])
 
     def test_fighter_will_save_uses_slow_progression(self):
         for per_level_bonus in TestCharacterClass.get_slow_save_per_level():
             fighter = Fighter(per_level_bonus[0])
-            self.assertEqual(fighter.get_will_save(), per_level_bonus[1])
+            self.assertEqual(fighter.get_will_save().value, per_level_bonus[1])
 
     def test_fighter_class_named_fighter(self):
         fighter = Fighter(14)
@@ -42,3 +42,15 @@ class TestFighter(unittest.TestCase):
     def test_fighter_level_above_twenty_not_allowed(self):
         with self.assertRaisesRegexp(ValueError, 'Character levels must be numbers from 1 to 20'):
             Fighter(21)
+
+    def test_fighter_fortitude_save_includes_audit(self):
+        fighter = Fighter(20)
+        self.assertEqual(fighter.get_fortitude_save().audit_explanation, '+12, Level 20 Fighter class bonus. ')
+
+    def test_fighter_reflex_save_includes_audit(self):
+        fighter = Fighter(19)
+        self.assertEqual(fighter.get_reflex_save().audit_explanation, '+6, Level 19 Fighter class bonus. ')
+
+    def test_fighter_will_save_includes_audit(self):
+        fighter = Fighter(18)
+        self.assertEqual(fighter.get_will_save().audit_explanation, '+6, Level 18 Fighter class bonus. ')

@@ -95,13 +95,28 @@ class Actor(object):
         return attack_bonus
 
     def get_fortitude_save(self):
-        return self.fortitude_save.value
+        """Returns the actor's fortitude saving throw including all temporary modifiers
+
+        Return:
+            Modifier object containing the saving throw along with audit trail
+        """
+        return self.fortitude_save.modifier
 
     def get_reflex_save(self):
-        return self.reflex_save.value
+        """Returns the actor's reflex saving throw including all temporary modifiers
+
+        Return:
+            Modifier object containing the saving throw along with audit trail
+        """
+        return self.reflex_save.modifier
 
     def get_will_save(self):
-        return self.will_save.value
+        """Returns the actor's will saving throw including all temporary modifiers
+
+        Return:
+            Modifier object containing the saving throw along with audit trail
+        """
+        return self.will_save.modifier
 
     def get_attribute_modifier(self, attribute_name):
         """Returns modifier for specified attribute including all temporary and permanent modifiers
