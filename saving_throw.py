@@ -1,7 +1,7 @@
 __author__ = 'John Mullins'
 
-from abc import ABCMeta, abstractmethod
 from modifier import Modifier
+from attribute import Attribute
 
 
 class SavingThrow(object):
@@ -10,7 +10,6 @@ class SavingThrow(object):
     other modifiers
 
     Attributes:
-        actor (Actor): Actor whose saving throw is being tracked
         name (string): Name of the saving throw, chosen only from the list of valid names
         modifier (Modifier): Saving throw score with all attributes, class bonuses, and miscellaneous modifiers
             as well as an audit trail
@@ -22,53 +21,50 @@ class SavingThrow(object):
         SAVING_THROW_NAMES (list[string]): list of valid saving throw names
     """
 
-    __metaclass__ = ABCMeta
-
     FORTITUDE = 'Fortitude'
     REFLEX = 'Reflex'
     WILL = 'Will'
     SAVING_THROW_NAMES = [FORTITUDE, REFLEX, WILL]
 
-    def __init__(self, actor):
+    def __init__(self, name):
         """Creates a single saving throw for an actor
 
         Args:
-            actor (Actor): Actor whose saving throw is being tracked
+            name (string): Name of the saving throw, chosen from the list of valid names within this class
         """
-        self.actor = actor
-        self.name = ''
-        self._set_name()
-        self.applicable_attributes = []
-        self._add_default_attribute()
+        if name == self.FORTITUDE:
+            self.applicable_attributes = [Attribute.CONSTITUTION]
+        elif name == self.REFLEX:
+            self.applicable_attributes = [Attribute.DEXTERITY]
+        elif name == self.WILL:
+            self.applicable_attributes = [Attribute.WISDOM]
+        else:
+            raise ValueError(name + ' is not a valid saving throw name')
+        self.name = name
+        self.modifier = None
 
-        # Calculate save based on initial information
-        self.modifier = self._calculate_save()
-
-    @abstractmethod
-    def _add_default_attribute(self):
-        pass
-
-    @abstractmethod
-    def _set_name(self):
-        pass
-
-    def _calculate_save(self):
+    def calculate_save(self, character_classes, attribute_modifiers):
         """Calculates the modifier representing the saving throw.
+
+        Args:
+            character_classes (list[CharacterClass]): List of character classes whose bonuses will be applied
+            attribute_modifiers (dict[string: Modifier]): Dictionary of attribute modifiers keyed by attribute name
 
         Return
             Modifier containing the save plus an audit trail
         """
-        total_save = Modifier(0)
-        for character_class in self.actor.character_classes:
+        total_save_modifier = Modifier(0)
+        for character_class in character_classes:
             class_bonus = character_class.get_saving_throw(self.name)
-            total_save.value += class_bonus.value
-            total_save.audit_explanation += class_bonus.audit_explanation
+            total_save_modifier.value += class_bonus.value
+            total_save_modifier.audit_explanation += class_bonus.audit_explanation
         for attribute in self.applicable_attributes:
-            attribute_bonus = self.actor.get_attribute_modifier(attribute)
-            total_save.value += attribute_bonus.value
-            total_save.audit_explanation += attribute_bonus.audit_explanation
+            if attribute in attribute_modifiers:
+                attribute_modifier = attribute_modifiers[attribute]
+                total_save_modifier.value += attribute_modifier.value
+                total_save_modifier.audit_explanation += attribute_modifier.audit_explanation
 
-        return total_save
+        self.modifier = total_save_modifier
 
     def add_attribute_to_save_modifiers(self, attribute_name):
         """Adds an attribute to the list of attributes whose modifiers are used when calculating the saving throw
@@ -78,4 +74,3 @@ class SavingThrow(object):
         """
         if attribute_name not in self.applicable_attributes:
             self.applicable_attributes.append(attribute_name)
-            self.modifier = self._calculate_save()

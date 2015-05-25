@@ -3,9 +3,6 @@ __author__ = 'John Mullins'
 from attribute import Attribute
 from character_class import CharacterClass
 from saving_throw import SavingThrow
-from saving_throws.fortitude import Fortitude
-from saving_throws.reflex import Reflex
-from saving_throws.will import Will
 from modifier import Modifier
 
 
@@ -18,10 +15,10 @@ class Actor(object):
     Attributes:
         name (string): Actor's name
         character_classes (list[CharacterClass): List of all character classes the Actor has at least one level in
-        base_attributes (dict[Attribute]): Dictionary of Attributes indexed by attribute name detailing the
+        _attributes (dict[Attribute]): Dictionary of Attributes indexed by attribute name detailing the
             character's permanent attributes. Permanent attributes include those assigned during creation and through
             addition of character classes, but do not include temporary modifiers
-        test_saving_throws (dict[SavingThrow]): Provides the actor's saves, including temporary and permanent modifiers,
+        _saving_throws (dict[SavingThrow]): Provides the actor's saves, including temporary and permanent modifiers,
             along with audit trail. Dictionary is indexed by save name from the SavingThrow class
     """
 
@@ -50,10 +47,11 @@ class Actor(object):
 
         # Initialize saving throws after classes and attributes have been assigned for complete bonuses
         self._saving_throws = {
-            SavingThrow.FORTITUDE: Fortitude(self),
-            SavingThrow.REFLEX: Reflex(self),
-            SavingThrow.WILL: Will(self)
+            SavingThrow.FORTITUDE: SavingThrow(SavingThrow.FORTITUDE),
+            SavingThrow.REFLEX: SavingThrow(SavingThrow.REFLEX),
+            SavingThrow.WILL: SavingThrow(SavingThrow.WILL),
         }
+        self.recalculate_saving_throws()
 
     def get_attack_bonus(self, attribute_names):
         """Returns attack bonus, including temporary modifiers, permanent modifiers, and additional attacks. Capable
@@ -151,3 +149,16 @@ class Actor(object):
         if attribute_name not in self._attributes:
             raise ValueError(attribute_name + ' is not an attribute ' + self.name + ' possesses.')
         return self._attributes[attribute_name].score
+
+    def get_all_attribute_modifiers(self):
+        """Creates a dictionary of all attribute bonuses keyed by attribute name"""
+        all_modifiers = {}
+        for attribute in self._attributes.values():
+            all_modifiers[attribute.name] = self.get_attribute_modifier(attribute.name)
+        return all_modifiers
+
+    def recalculate_saving_throws(self):
+        """Updates all saving throw modifiers using most recent actor information"""
+        all_attribute_modifiers = self.get_all_attribute_modifiers()
+        for saving_throw in self._saving_throws.values():
+            saving_throw.calculate_save(self.character_classes, all_attribute_modifiers)
