@@ -17,10 +17,10 @@ class TestActor(unittest.TestCase):
         strength = Attribute(Attribute.STRENGTH, 18)
         constitution = Attribute(Attribute.CONSTITUTION, 16)
         actor = Actor('Test Fighter Guy', [strength, constitution], [])
-        self.assertEqual(actor._base_attributes[Attribute.STRENGTH].score, 18)
-        self.assertEqual(actor._base_attributes[Attribute.STRENGTH].name, 'Strength')
-        self.assertEqual(actor._base_attributes[Attribute.CONSTITUTION].score, 16)
-        self.assertEqual(actor._base_attributes[Attribute.CONSTITUTION].name, 'Constitution')
+        self.assertEqual(actor._attributes[Attribute.STRENGTH].score, 18)
+        self.assertEqual(actor._attributes[Attribute.STRENGTH].name, 'Strength')
+        self.assertEqual(actor._attributes[Attribute.CONSTITUTION].score, 16)
+        self.assertEqual(actor._attributes[Attribute.CONSTITUTION].name, 'Constitution')
 
     def test_get_attack_bonus_requires_list_of_Attributes(self):
         strength = Attribute(Attribute.STRENGTH, 14)
@@ -139,3 +139,19 @@ class TestActor(unittest.TestCase):
             actor.get_will_save().audit_explanation,
             '+1, Level 3 Rogue class bonus. +7, Wisdom ability score of 24. '
         )
+
+    def test_get_base_attribute_score_flags_missing_attribute(self):
+        wisdom = Attribute(Attribute.WISDOM, 24)
+        rogue = Rogue(4)
+        actor = Actor('Test Rogue With Rouge', [wisdom], [rogue])
+        with self.assertRaisesRegexp(
+                ValueError,
+                'Dexterity is not an attribute Test Rogue With Rouge possesses.'
+        ):
+            actor.get_base_attribute_score(Attribute.DEXTERITY)
+
+    def test_get_base_attribute_score_returns_requested_score(self):
+        wisdom = Attribute(Attribute.WISDOM, 3)
+        rogue = Rogue(13)
+        actor = Actor('Test Rogue With Rouge', [wisdom], [rogue])
+        self.assertEqual(actor.get_base_attribute_score(Attribute.WISDOM), 3)

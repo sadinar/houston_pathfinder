@@ -1,8 +1,6 @@
 __author__ = 'John Mullins'
 
 import unittest
-from saving_throws.fortitude import Fortitude
-from saving_throws.reflex import Reflex
 from saving_throws.will import Will
 from actor import Actor
 from attribute import Attribute
