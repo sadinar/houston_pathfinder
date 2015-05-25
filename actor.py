@@ -2,7 +2,9 @@ __author__ = 'John Mullins'
 
 from attribute import Attribute
 from character_class import CharacterClass
-from saving_throw import SavingThrow
+from saving_throws.fortitude import Fortitude
+from saving_throws.reflex import Reflex
+from saving_throws.will import Will
 from modifier import Modifier
 
 
@@ -47,9 +49,9 @@ class Actor(object):
                 raise TypeError('Unable to initialize actor using unknown character class')
             self.character_classes.append(character_class)
 
-        self.fortitude_save = SavingThrow(self, SavingThrow.FORTITUDE)
-        self.reflex_save = SavingThrow(self, SavingThrow.REFLEX)
-        self.will_save = SavingThrow(self, SavingThrow.WILL)
+        self.fortitude_save = Fortitude(self)
+        self.reflex_save = Reflex(self)
+        self.will_save = Will(self)
 
     def get_attack_bonus(self, attribute_names):
         """Returns attack bonus, including temporary modifiers, permanent modifiers, and additional attacks. Capable

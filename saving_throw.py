@@ -1,5 +1,6 @@
 __author__ = 'John Mullins'
 
+from abc import ABCMeta, abstractmethod
 from attribute import Attribute
 from modifier import Modifier
 
@@ -22,35 +23,34 @@ class SavingThrow(object):
         SAVING_THROW_NAMES (list[string]): list of valid saving throw names
     """
 
+    __metaclass__ = ABCMeta
+
     FORTITUDE = 'Fortitude'
     REFLEX = 'Reflex'
     WILL = 'Will'
     SAVING_THROW_NAMES = [FORTITUDE, REFLEX, WILL]
 
-    def __init__(self, actor, name):
+    def __init__(self, actor):
         """Creates a single saving throw for an actor
 
         Args:
             actor (Actor): Actor whose saving throw is being tracked
-            name (string): Name of the saving throw which must be from the valid list of names
         """
         self.actor = actor
+        self._set_name()
         self.applicable_attributes = []
-
-        if name not in self.SAVING_THROW_NAMES:
-            raise ValueError(name + ' is not a valid saving throw name')
-        self.name = name
-
-        # Initialize attribute bonus
-        if name == self.FORTITUDE:
-            self.add_attribute_to_save_modifiers(Attribute.CONSTITUTION)
-        elif name == self.REFLEX:
-            self.add_attribute_to_save_modifiers(Attribute.DEXTERITY)
-        else:
-            self.add_attribute_to_save_modifiers(Attribute.WISDOM)
+        self._add_default_attribute()
 
         # Calculate save based on initial information
         self.modifier = self._calculate_save()
+
+    @abstractmethod
+    def _add_default_attribute(self):
+        pass
+
+    @abstractmethod
+    def _set_name(self):
+        pass
 
     def _calculate_save(self):
         """Calculates the modifier representing the saving throw.
