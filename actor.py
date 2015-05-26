@@ -47,11 +47,10 @@ class Actor(object):
 
         # Initialize saving throws after classes and attributes have been assigned for complete bonuses
         self._saving_throws = {
-            SavingThrow.FORTITUDE: SavingThrow(SavingThrow.FORTITUDE),
-            SavingThrow.REFLEX: SavingThrow(SavingThrow.REFLEX),
-            SavingThrow.WILL: SavingThrow(SavingThrow.WILL),
+            SavingThrow.FORTITUDE: self._initialize_saving_throw(SavingThrow.FORTITUDE),
+            SavingThrow.REFLEX: self._initialize_saving_throw(SavingThrow.REFLEX),
+            SavingThrow.WILL: self._initialize_saving_throw(SavingThrow.WILL),
         }
-        self.recalculate_saving_throws()
 
     def get_attack_bonus(self, attribute_names):
         """Returns attack bonus, including temporary modifiers, permanent modifiers, and additional attacks. Capable
@@ -106,7 +105,7 @@ class Actor(object):
         Return:
             Modifier object containing the saving throw along with audit trail
         """
-        return self._saving_throws[SavingThrow.FORTITUDE].modifier
+        return self._saving_throws[SavingThrow.FORTITUDE].get_modifier()
 
     def get_reflex_save(self):
         """Returns the actor's reflex saving throw including all temporary modifiers
@@ -114,7 +113,7 @@ class Actor(object):
         Return:
             Modifier object containing the saving throw along with audit trail
         """
-        return self._saving_throws[SavingThrow.REFLEX].modifier
+        return self._saving_throws[SavingThrow.REFLEX].get_modifier()
 
     def get_will_save(self):
         """Returns the actor's will saving throw including all temporary modifiers
@@ -122,7 +121,7 @@ class Actor(object):
         Return:
             Modifier object containing the saving throw along with audit trail
         """
-        return self._saving_throws[SavingThrow.WILL].modifier
+        return self._saving_throws[SavingThrow.WILL].get_modifier()
 
     def get_attribute_modifier(self, attribute_name):
         """Returns modifier for specified attribute including all temporary and permanent modifiers
@@ -150,15 +149,10 @@ class Actor(object):
             raise ValueError(attribute_name + ' is not an attribute ' + self.name + ' possesses.')
         return self._attributes[attribute_name].score
 
-    def get_all_attribute_modifiers(self):
-        """Creates a dictionary of all attribute bonuses keyed by attribute name"""
-        all_modifiers = {}
-        for attribute in self._attributes.values():
-            all_modifiers[attribute.name] = self.get_attribute_modifier(attribute.name)
-        return all_modifiers
+    def _initialize_saving_throw(self, saving_throw_name):
+        if SavingThrow.BASE_ATTRIBUTES[saving_throw_name] in self._attributes.keys():
+            save_attribute = self._attributes[SavingThrow.BASE_ATTRIBUTES[saving_throw_name]]
+        else:
+            save_attribute = None
 
-    def recalculate_saving_throws(self):
-        """Updates all saving throw modifiers using most recent actor information"""
-        all_attribute_modifiers = self.get_all_attribute_modifiers()
-        for saving_throw in self._saving_throws.values():
-            saving_throw.calculate_save(self.character_classes, all_attribute_modifiers)
+        return SavingThrow(saving_throw_name, self.character_classes, save_attribute)
