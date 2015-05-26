@@ -49,15 +49,28 @@ class TestSavingThrow(unittest.TestCase):
         fort_save = SavingThrow(SavingThrow.FORTITUDE, [], None)
         self.assertEqual(fort_save.name, 'Fortitude')
 
-    def test_add_attribute_to_save_bonus_ignores_duplicates(self):
+    def test_add_attribute_adds_requested_attribute(self):
         actor = Actor('John', [Attribute(Attribute.WISDOM, 5)], [Fighter(3)])
         will_save = actor._saving_throws[SavingThrow.WILL]
         self.assertEqual(will_save.get_modifier().value, -2)
         self.assertEqual(len(will_save._attributes), 1)
         self.assertIsNotNone(will_save._attributes[SavingThrow.BASE_ATTRIBUTES[SavingThrow.WILL]])
 
-        will_save.add_attribute_to_save_modifiers(Attribute(Attribute.WISDOM, 15))
+        will_save.add_attribute(Attribute(Attribute.STRENGTH, 39))
+        self.assertEqual(will_save.get_modifier().value, 12)
+        self.assertEqual(len(will_save._attributes), 2)
+        self.assertIsNotNone(will_save._attributes[SavingThrow.BASE_ATTRIBUTES[SavingThrow.WILL]])
+        self.assertIsNotNone(will_save._attributes[Attribute.STRENGTH])
+
+    def test_add_attribute_replaces_original_when_duplicate_name_passed(self):
+        actor = Actor('John', [Attribute(Attribute.WISDOM, 5)], [Fighter(3)])
+        will_save = actor._saving_throws[SavingThrow.WILL]
         self.assertEqual(will_save.get_modifier().value, -2)
+        self.assertEqual(len(will_save._attributes), 1)
+        self.assertIsNotNone(will_save._attributes[SavingThrow.BASE_ATTRIBUTES[SavingThrow.WILL]])
+
+        will_save.add_attribute(Attribute(Attribute.WISDOM, 15))
+        self.assertEqual(will_save.get_modifier().value, 3)
         self.assertEqual(len(will_save._attributes), 1)
         self.assertIsNotNone(will_save._attributes[SavingThrow.BASE_ATTRIBUTES[SavingThrow.WILL]])
 
@@ -68,3 +81,11 @@ class TestSavingThrow(unittest.TestCase):
             will_save.get_modifier().audit_explanation,
             '+2, Level 7 Fighter class bonus. -4, Wisdom ability score of 2. '
         )
+
+    def test_remove_attribute_no_op_for_missing_attribute(self):
+        actor = Actor('John', [Attribute(Attribute.CONSTITUTION, 10)], [Fighter(9)])
+        fort_save = actor._saving_throws[SavingThrow.FORTITUDE]
+        fort_save.remove_attribute(Attribute.DEXTERITY)
+        self.assertEqual(fort_save.get_modifier().value, 6)
+        self.assertEqual(len(fort_save._attributes), 1)
+        self.assertIsNotNone(fort_save._attributes[SavingThrow.BASE_ATTRIBUTES[SavingThrow.FORTITUDE]])

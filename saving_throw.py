@@ -65,11 +65,16 @@ class SavingThrow(object):
 
         return total_save_modifier
 
-    def add_attribute_to_save_modifiers(self, attribute):
-        """Adds an attribute to the list of attributes whose modifiers are used when calculating the saving throw
+    def add_attribute(self, attribute):
+        """Adds an Attribute to the list of Attributes whose modifiers are used when calculating the saving throw.
+        If an Attribute with the same name already exists, will replace the existing Attribute
 
         Args:
             attribute_name (string): Name of the attribute being added
         """
-        if attribute.name not in self._attributes.keys():
-            self._attributes[attribute.name] = attribute
+        self._attributes[attribute.name] = attribute
+
+    def remove_attribute(self, attribute_name):
+        """Removes the specified attribute from the dictionary of attributes modifying the save"""
+        if attribute_name in self._attributes.keys():
+            del self._attributes[attribute_name]
