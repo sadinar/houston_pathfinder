@@ -89,3 +89,7 @@ class TestSavingThrow(unittest.TestCase):
         self.assertEqual(fort_save.get_modifier().value, 6)
         self.assertEqual(len(fort_save._attributes), 1)
         self.assertIsNotNone(fort_save._attributes[SavingThrow.BASE_ATTRIBUTES[SavingThrow.FORTITUDE]])
+
+    def test_saving_throw_rejects_bad_name(self):
+        with self.assertRaisesRegexp(ValueError, 'not a name is not a valid saving throw name'):
+            SavingThrow('not a name', {}, {})

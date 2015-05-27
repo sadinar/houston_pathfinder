@@ -6,7 +6,7 @@ from attribute import Attribute
 
 class SavingThrow(object):
 
-    """Maintains the aggregate modifier for one of an actor's saving throws. Includes class, attribute, and
+    """Calculates the aggregate modifier for one of an actor's saving throws. Includes class, attribute, and
     other modifiers
 
     Attributes:
@@ -18,7 +18,8 @@ class SavingThrow(object):
         REFLEX (string): Name of reflex saving throw
         WILL (string): Name of will saving throw
         SAVING_THROW_NAMES (list[string]): list of valid saving throw names
-        BASE_ATTRIBUTES (list[string[): list of attributes serving as the basis for specific saving throws
+        BASE_ATTRIBUTES (dict[string[]): list of attributes whose modifiers apply to a save by default. Dictionary
+            in save_name: attribute_name format
     """
 
     FORTITUDE = 'Fortitude'
@@ -32,7 +33,7 @@ class SavingThrow(object):
     }
 
     def __init__(self, name, character_classes, base_attribute):
-        """Creates a single saving throw for an actor
+        """Creates a saving throw for an actor
 
         Args:
             name (string): Name of the saving throw
@@ -40,6 +41,8 @@ class SavingThrow(object):
             attribute (Attribute): Base attribute for the saving throw
         """
 
+        if name not in self.SAVING_THROW_NAMES:
+            raise ValueError(name + ' is not a valid saving throw name')
         self.name = name
         self._character_classes = character_classes
         if base_attribute is not None:
@@ -54,7 +57,7 @@ class SavingThrow(object):
             Modifier containing the save plus an audit trail
         """
         total_save_modifier = Modifier(0)
-        for character_class in self._character_classes:
+        for character_class in self._character_classes.values():
             class_bonus = character_class.get_saving_throw(self.name)
             total_save_modifier.value += class_bonus.value
             total_save_modifier.audit_explanation += class_bonus.audit_explanation

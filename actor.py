@@ -14,7 +14,7 @@ class Actor(object):
 
     Attributes:
         name (string): Actor's name
-        character_classes (list[CharacterClass): List of all character classes the Actor has at least one level in
+        _character_classes (dict[CharacterClass): Dict of all character classes the Actor has at least one level in
         _attributes (dict[Attribute]): Dictionary of Attributes indexed by attribute name detailing the
             character's permanent attributes. Permanent attributes include those assigned during creation and through
             addition of character classes, but do not include temporary modifiers
@@ -27,13 +27,13 @@ class Actor(object):
 
         Args:
             name (string): Name of the character used for display purposes only
-            base_attributes (list[Attribute]): List of Attribute objects assigned to the character. Does not include
+            attributes (list[Attribute]): List of Attribute objects assigned to the character. Does not include
                 temporary modifiers of any kind
             character_classes (list[CharacterClass]): List of CharacterClass objects representing the levels and
                 decisions made for character's classes
         """
         self.name = name
-        self.character_classes = []
+        self._character_classes = {}
         self._attributes = {}
 
         for attribute in attributes:
@@ -43,7 +43,7 @@ class Actor(object):
         for character_class in character_classes:
             if not isinstance(character_class, CharacterClass):
                 raise TypeError('Unable to initialize actor using unknown character class')
-            self.character_classes.append(character_class)
+            self._character_classes[character_class.name] = character_class
 
         # Initialize saving throws after classes and attributes have been assigned for complete bonuses
         self._saving_throws = {
@@ -70,7 +70,7 @@ class Actor(object):
         base_attack_bonus = 0
 
         # Add bonuses from all attached character classes to get total base attack
-        for character_class in self.character_classes:
+        for character_class in self._character_classes.values():
             base_attack_bonus += character_class.get_base_attack_bonus()
 
         attack_bonuses = Actor._add_additional_attacks(base_attack_bonus)
@@ -150,9 +150,16 @@ class Actor(object):
         return self._attributes[attribute_name].score
 
     def _initialize_saving_throw(self, saving_throw_name):
+        """
+        Args:
+            saving_throw_name (string): Name of the save being set to default values
+
+        Returns:
+            SavingThrow which uses actor's character classes and save default attribute, if available
+        """
         if SavingThrow.BASE_ATTRIBUTES[saving_throw_name] in self._attributes.keys():
             save_attribute = self._attributes[SavingThrow.BASE_ATTRIBUTES[saving_throw_name]]
         else:
             save_attribute = None
 
-        return SavingThrow(saving_throw_name, self.character_classes, save_attribute)
+        return SavingThrow(saving_throw_name, self._character_classes, save_attribute)
