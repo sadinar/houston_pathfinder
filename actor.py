@@ -163,3 +163,12 @@ class Actor(object):
             save_attribute = None
 
         return SavingThrow(saving_throw_name, self._character_classes, save_attribute)
+
+    def get_base_attack_bonus(self):
+        """Adds bonuses from all attached character classes to get total base attack"""
+        base_attack_modifier = Modifier(0, '')
+        for character_class in self._character_classes.values():
+            class_base_bonus = character_class.get_base_attack_bonus()
+            base_attack_modifier.value += class_base_bonus
+            base_attack_modifier.audit_explanation += '{:+d}'.format(class_base_bonus) + ' from level '\
+                + str(character_class.level) + ' ' + character_class.name + '. '
