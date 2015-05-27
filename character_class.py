@@ -1,6 +1,6 @@
 __author__ = 'John Mullins'
 
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 from saving_throw import SavingThrow
 from modifier import Modifier
 
@@ -22,8 +22,7 @@ class CharacterClass(object):
             raise ValueError('Character levels must be numbers from 1 to 20')
         self.level = level
 
-    @property
-    @abstractmethod
+    @abstractproperty
     def name(self):
         pass
 

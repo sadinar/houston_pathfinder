@@ -22,32 +22,6 @@ class TestActor(unittest.TestCase):
         self.assertEqual(actor._attributes[Attribute.CONSTITUTION].score, 16)
         self.assertEqual(actor._attributes[Attribute.CONSTITUTION].name, 'Constitution')
 
-    def test_get_attack_bonus_requires_list_of_Attributes(self):
-        strength = Attribute(Attribute.STRENGTH, 14)
-        actor = Actor('Test Actor Dude', [strength], [])
-        with self.assertRaisesRegexp(
-                ValueError,
-                'A list of attributes, possibly empty, must be provided to calculate attack bonus'
-        ):
-            actor.get_attack_bonus(Attribute.STRENGTH), strength.get_attribute_modifier()
-
-    def test_actor_includes_attributes_in_attack_bonus(self):
-        strength = Attribute(Attribute.STRENGTH, 14)
-        actor = Actor('Test Actor Dude', [strength], [])
-        self.assertEqual(actor.get_attack_bonus([Attribute.STRENGTH])[0], strength.get_attribute_modifier().value)
-
-    def test_actor_includes_class_base_attack_bonus_in_attack_bonus(self):
-        fighter = Fighter(7)
-        actor = Actor('Test Actor Dude', [], [fighter])
-        self.assertEqual(actor.get_attack_bonus([]), [7, 2])
-
-    def test_actor_combines_class_and_attribute_bonus_during_attack_bonus_calculation(self):
-        fighter = Fighter(16)
-        strength = Attribute(Attribute.STRENGTH, 19)
-        actor = Actor('Test Actor Dude', [strength], [fighter])
-        expected_bonuses = [20, 15, 10, 5]
-        self.assertEqual(actor.get_attack_bonus([Attribute.STRENGTH]), expected_bonuses)
-
     def test_fortitude_save_includes_constitution_bonus(self):
         constitution = Attribute(Attribute.CONSTITUTION, 19)
         actor = Actor('Test Actor Dude', [constitution], [])
@@ -105,14 +79,6 @@ class TestActor(unittest.TestCase):
             rogue.get_will_save().value + wisdom.get_attribute_modifier().value
         )
 
-    def test_actor_combines_multiple_classes_during_attack_calculation(self):
-        strength = Attribute(Attribute.STRENGTH, 19)
-        fighter = Fighter(3)
-        rogue = Rogue(12)
-        actor = Actor('Sven', [strength], [fighter, rogue])
-        expected_attacks = [16, 11, 6]
-        self.assertEqual(actor.get_attack_bonus([Attribute.STRENGTH]), expected_attacks)
-
     def test_fortitude_save_includes_audit(self):
         constitution = Attribute(Attribute.CONSTITUTION, 22)
         rogue = Rogue(1)
@@ -167,6 +133,61 @@ class TestActor(unittest.TestCase):
         )
 
     def test_get_base_attack_returns_empty_modifier_for_classless_actor(self):
-        actor = Actor('Fighter Rogue', [], [])
+        actor = Actor('Blank guy', [], [])
         self.assertEqual(actor.get_base_attack_bonus().value, 0)
         self.assertEqual(actor.get_base_attack_bonus().audit_explanation, '')
+
+    def test_get_full_attack_returns_list_of_modifiers(self):
+        fighter = Fighter(2)
+        rogue = Rogue(19)
+        actor = Actor('Rogue Fighter', [], [rogue, fighter])
+        full_attack = actor.get_full_attack([])
+        self.assertEqual(len(full_attack), 4)
+        self.assertEqual(full_attack[0].value, 16)
+        self.assertEqual(full_attack[0].audit_explanation, '+14 from level 19 Rogue. +2 from level 2 Fighter. ')
+        self.assertEqual(full_attack[1].value, 11)
+        self.assertEqual(
+            full_attack[1].audit_explanation,
+            'Additional attack split from base BAB at a +5 breakpoint. See first attack for full audit trail.'
+        )
+        self.assertEqual(full_attack[2].value, 6)
+        self.assertEqual(
+            full_attack[2].audit_explanation,
+            'Additional attack split from base BAB at a +5 breakpoint. See first attack for full audit trail.'
+        )
+        self.assertEqual(full_attack[3].value, 1)
+        self.assertEqual(
+            full_attack[3].audit_explanation,
+            'Additional attack split from base BAB at a +5 breakpoint. See first attack for full audit trail.'
+        )
+
+    def test_get_full_attack_adds_requested_attributes(self):
+
+        fighter = Fighter(5)
+        rogue = Rogue(16)
+        strength = Attribute(Attribute.STRENGTH, 16)
+        dexterity = Attribute(Attribute.DEXTERITY, 14)
+        actor = Actor('Rogue Fighter', [strength, dexterity], [rogue, fighter])
+        full_attack = actor.get_full_attack([strength.name, dexterity.name])
+        self.assertEqual(len(full_attack), 4)
+        self.assertEqual(full_attack[0].value, 22)
+        self.assertEqual(
+            full_attack[0].audit_explanation,
+            '+12 from level 16 Rogue. +5 from level 5 Fighter. +3, Strength ability score of 16. +2, ' +
+            'Dexterity ability score of 14. '
+        )
+        self.assertEqual(full_attack[1].value, 17)
+        self.assertEqual(
+            full_attack[1].audit_explanation,
+            'Additional attack split from base BAB at a +5 breakpoint. See first attack for full audit trail.'
+        )
+        self.assertEqual(full_attack[2].value, 12)
+        self.assertEqual(
+            full_attack[2].audit_explanation,
+            'Additional attack split from base BAB at a +5 breakpoint. See first attack for full audit trail.'
+        )
+        self.assertEqual(full_attack[3].value, 7)
+        self.assertEqual(
+            full_attack[3].audit_explanation,
+            'Additional attack split from base BAB at a +5 breakpoint. See first attack for full audit trail.'
+        )
