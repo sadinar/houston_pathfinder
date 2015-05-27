@@ -155,3 +155,18 @@ class TestActor(unittest.TestCase):
         rogue = Rogue(13)
         actor = Actor('Test Rogue With Rouge', [wisdom], [rogue])
         self.assertEqual(actor.get_base_attribute_score(Attribute.WISDOM), 3)
+
+    def test_get_base_attack_returns_sum_of_class_bab(self):
+        fighter = Fighter(11)
+        rogue = Rogue(4)
+        actor = Actor('Fighter Rogue', [], [fighter, rogue])
+        self.assertEqual(actor.get_base_attack_bonus().value, 14)
+        self.assertEqual(
+            actor.get_base_attack_bonus().audit_explanation,
+            '+3 from level 4 Rogue. +11 from level 11 Fighter. '
+        )
+
+    def test_get_base_attack_returns_empty_modifier_for_classless_actor(self):
+        actor = Actor('Fighter Rogue', [], [])
+        self.assertEqual(actor.get_base_attack_bonus().value, 0)
+        self.assertEqual(actor.get_base_attack_bonus().audit_explanation, '')

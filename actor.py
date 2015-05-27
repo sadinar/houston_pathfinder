@@ -172,3 +172,4 @@ class Actor(object):
             base_attack_modifier.value += class_base_bonus
             base_attack_modifier.audit_explanation += '{:+d}'.format(class_base_bonus) + ' from level '\
                 + str(character_class.level) + ' ' + character_class.name + '. '
+        return base_attack_modifier
