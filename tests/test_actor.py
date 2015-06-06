@@ -155,7 +155,6 @@ class TestActor(unittest.TestCase):
         )
 
     def test_get_full_attack_adds_requested_attributes(self):
-
         fighter = Fighter(5)
         rogue = Rogue(16)
         strength = Attribute(Attribute.STRENGTH, 16)
@@ -183,3 +182,11 @@ class TestActor(unittest.TestCase):
             'Additional attack split from base BAB at a +5 breakpoint. See first attack for full audit trail.',
             full_attack[3].audit_explanation
         )
+
+    def test_get_damage_returns_modifier_with_dice(self):
+        fighter = Fighter(5)
+        rogue = Rogue(16)
+        strength = Attribute(Attribute.STRENGTH, 16)
+        dexterity = Attribute(Attribute.DEXTERITY, 14)
+        actor = Actor('Rogue Fighter', [strength, dexterity], [rogue, fighter])
+        self.assertEqual('1d3+3', actor.get_attack_damage('base_attack'))

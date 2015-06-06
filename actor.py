@@ -21,6 +21,7 @@ class Actor(object):
             addition of character classes, but do not include temporary modifiers
         _saving_throws (dict[SavingThrow]): Provides the actor's saves, including temporary and permanent modifiers,
             along with audit trail. Dictionary is indexed by save name from the SavingThrow class
+        _attacks (dict[Attack]): Dict of attacks actor can perform which are capable of calculating attack and damage
     """
 
     def __init__(self, name, attributes, character_classes):
@@ -57,12 +58,14 @@ class Actor(object):
             SavingThrow.WILL: self._initialize_saving_throw(SavingThrow.WILL),
         }
 
-        self.basic_attack = Attack(
-            'base attack',
-            [self._attributes[Attribute.STRENGTH]],
-            [self._attributes[Attribute.STRENGTH]],
-            self._character_classes.values()
-        )
+        self._attacks = {
+            'base_attack': Attack(
+                'base attack',
+                [self._attributes[Attribute.STRENGTH]],
+                [self._attributes[Attribute.STRENGTH]],
+                self._character_classes.values()
+            )
+        }
 
     def get_fortitude_save(self):
         """Returns the actor's fortitude saving throw including all temporary modifiers
@@ -129,7 +132,7 @@ class Actor(object):
 
     def get_base_attack_bonus(self):
         """Adds bonuses from all attached character classes to get total base attack"""
-        return self.basic_attack.get_base_attack_bonus()
+        return self._attacks['base_attack'].get_base_attack_bonus()
 
     def get_full_attack(self):
         """Creates a list of attack modifiers using BAB to calculate multiple attacks then adding additional modifiers
@@ -143,4 +146,17 @@ class Actor(object):
             list of Modifiers representing the modifier for each attack. See the first attack in the list for the
             full audit trail
         """
-        return self.basic_attack.get_full_attacks()
+        return self._attacks['base_attack'].get_full_attacks()
+
+    def get_attack_damage(self, attack_name):
+        """Determines the damage for the specified attack
+
+        Args:
+            attack_name (string): Name of the attack whose damage should be returned
+
+        Returns:
+            Modifier describing the damage of the attack
+        """
+        if not (attack_name in self._attacks):
+            raise ValueError(attack_name + ' is not an attack ' + self.name + ' possesses.')
+        return self._attacks[attack_name].get_damage()

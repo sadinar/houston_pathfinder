@@ -16,11 +16,6 @@ class Attack(object):
             the basis of the attack's chance to hit and dictate the number of initial additional attacks
     """
 
-    name = ''
-    _damage_attributes = {}
-    _to_hit_attributes = {}
-    _character_classes = {}
-
     def __init__(self, name, damage_attributes, to_hit_attributes, character_classes):
         """Creates an attack instance which uses the provided attributes and classes to calculate attack values.
 
@@ -31,10 +26,13 @@ class Attack(object):
             character_classes (list[CharacterClass]): List of character classes used to generate basis for attack
         """
         self.name = name
+        self._damage_attributes = {}
         for damage_attribute in damage_attributes:
             self._damage_attributes[damage_attribute.name] = damage_attribute
+        self._to_hit_attributes = {}
         for to_hit_attribute in to_hit_attributes:
             self._to_hit_attributes[to_hit_attribute.name] = to_hit_attribute
+        self._character_classes = {}
         for character_class in character_classes:
             self._character_classes[character_class.name] = character_class
 
@@ -98,3 +96,17 @@ class Attack(object):
                     # add audit trail only to first entry
                     attack.audit_explanation += attribute_modifier.audit_explanation
         return split_attacks
+
+    def get_damage(self):
+        """Calculates attack damage"""
+        # Calculate total modifier
+        damage_modifier = Modifier(0, '')
+        for attribute in self._damage_attributes.values():
+            attribute_modifier = attribute.get_attribute_modifier()
+            damage_modifier.value += attribute_modifier.value
+            damage_modifier.audit_explanation += attribute_modifier.audit_explanation
+
+        # Add to the weapon damage
+        # Create a damage class?
+
+        return '1d3+' + str(damage_modifier.value)
