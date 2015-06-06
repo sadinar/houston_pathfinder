@@ -1,15 +1,44 @@
 __author__ = 'John Mullins'
 
-from abc import ABCMeta
 from modifier import Modifier
 
 
 class Attack(object):
 
-    __metaclass__ = ABCMeta
+    """Represents a single attack and tracks the attributes and modifiers which impact the attack as well as
+    calculating the attack and damage associated with the attack.
 
-    @staticmethod
-    def add_additional_attacks(base_attack_modifier):
+    Attributes:
+        name (string): The attack's name
+        damage_attributes (dict[Attribute]): Dictionary of attributes which enhance the attack's damage
+        to_hit_attributes (dict[Attribute]): Dictionary of attributes which improve the chance to hit
+        character_classes (dict[CharacterClass]): Dictionary of character classes whose base attack bonuses comprise
+            the basis of the attack's chance to hit and dictate the number of initial additional attacks
+    """
+
+    name = ''
+    _damage_attributes = {}
+    _to_hit_attributes = {}
+    _character_classes = {}
+
+    def __init__(self, name, damage_attributes, to_hit_attributes, character_classes):
+        """Creates an attack instance which uses the provided attributes and classes to calculate attack values.
+
+        Args:
+            name (string): Name of the attack
+            damage_attributes (list[Attribute]): List of attributes which modify the damage reported by the attack
+            to_hit_attributes (list[Attribute]): List of attributes used to modify attack's chance to hit
+            character_classes (list[CharacterClass]): List of character classes used to generate basis for attack
+        """
+        self.name = name
+        for damage_attribute in damage_attributes:
+            self._damage_attributes[damage_attribute.name] = damage_attribute
+        for to_hit_attribute in to_hit_attributes:
+            self._to_hit_attributes[to_hit_attribute.name] = to_hit_attribute
+        for character_class in character_classes:
+            self._character_classes[character_class.name] = character_class
+
+    def _add_additional_attacks(self, base_attack_modifier):
         """Given a base attack bonus(BAB), adds additional attacks derived strictly from sufficiently high BAB bonus.
 
         Args:
@@ -21,7 +50,7 @@ class Attack(object):
         attack_bonus = [base_attack_modifier]
         weakest_attack = attack_bonus[-1]
         if weakest_attack.value - 5 > 0:
-            attack_bonus += Attack.add_additional_attacks(
+            attack_bonus += self._add_additional_attacks(
                 Modifier(
                     weakest_attack.value - 5,
                     'Additional attack split from base BAB at a +5 breakpoint. See first attack for full audit trail.'
@@ -29,8 +58,7 @@ class Attack(object):
             )
         return attack_bonus
 
-    @staticmethod
-    def get_base_attack_bonus(character_classes):
+    def get_base_attack_bonus(self):
         """Adds bonuses from all attached character classes to get total base attack
 
         Args:
@@ -40,7 +68,7 @@ class Attack(object):
             Modifier containing total BAB along with audit trail showing each class' contribution
         """
         base_attack_modifier = Modifier(0, '')
-        for character_class in character_classes:
+        for character_class in self._character_classes.values():
             # sum the BAB bonuses of each class
             class_base_bonus = character_class.get_base_attack_bonus()
             base_attack_modifier.value += class_base_bonus
@@ -48,8 +76,7 @@ class Attack(object):
                 + str(character_class.level) + ' ' + character_class.name + '. '
         return base_attack_modifier
 
-    @staticmethod
-    def get_full_attacks(attributes, character_classes):
+    def get_full_attacks(self):
         """Calculates attack modifiers for each attack derived from a BAB using class and attribute bonuses.
 
         Args:
@@ -61,10 +88,10 @@ class Attack(object):
             List of Modifiers describing the bonus for each attack. See the first attack for the full audit trail
             of the bonuses.
         """
-        split_attacks = Attack.add_additional_attacks(Attack.get_base_attack_bonus(character_classes))
+        split_attacks = self._add_additional_attacks(self.get_base_attack_bonus())
         for index, attack in enumerate(split_attacks):
             # add specified attribute bonus to attacks
-            for attribute in attributes:
+            for attribute in self._to_hit_attributes.values():
                 attribute_modifier = attribute.get_attribute_modifier()
                 attack.value += attribute_modifier.value
                 if index == 0:

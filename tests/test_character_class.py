@@ -15,26 +15,26 @@ class TestCharacterClass(unittest.TestCase):
 
     def test_get_fast_progression_attack_bonus_uses_fast_bonus(self):
         for per_level_bonus in self.get_fast_attack_bonus_per_level():
-            self.assertEqual(CharacterClass._get_fast_progression_attack_bonus(per_level_bonus[0]), per_level_bonus[1])
+            self.assertEqual(per_level_bonus[1], CharacterClass._get_fast_progression_attack_bonus(per_level_bonus[0]))
 
     def test_get_medium_progression_attack_bonus_uses_medium_bonus(self):
         for per_level_bonus in self.get_medium_attack_bonus_per_level():
             self.assertEqual(
-                CharacterClass._get_medium_progression_attack_bonus(per_level_bonus[0]),
-                per_level_bonus[1]
+                per_level_bonus[1],
+                CharacterClass._get_medium_progression_attack_bonus(per_level_bonus[0])
             )
 
     def test_get_slow_progression_attack_bonus_uses_slow_bonus(self):
         for per_level_bonus in self.get_slow_attack_bonus_per_level():
-            self.assertEqual(CharacterClass._get_slow_progression_attack_bonus(per_level_bonus[0]), per_level_bonus[1])
+            self.assertEqual(per_level_bonus[1], CharacterClass._get_slow_progression_attack_bonus(per_level_bonus[0]))
 
     def test_get_fast_progression_save_returns_fast_save(self):
         for per_level_bonus in self.get_fast_save_per_level():
-            self.assertEqual(CharacterClass._get_fast_progression_save(per_level_bonus[0]), per_level_bonus[1])
+            self.assertEqual(per_level_bonus[1], CharacterClass._get_fast_progression_save(per_level_bonus[0]))
 
     def test_get_slow_progression_save_returns_slow_save(self):
         for per_level_bonus in self.get_slow_save_per_level():
-            self.assertEqual(CharacterClass._get_slow_progression_save(per_level_bonus[0]), per_level_bonus[1])
+            self.assertEqual(per_level_bonus[1], CharacterClass._get_slow_progression_save(per_level_bonus[0]))
 
     @staticmethod
     def get_fast_attack_bonus_per_level():

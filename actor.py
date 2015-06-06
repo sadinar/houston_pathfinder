@@ -24,7 +24,7 @@ class Actor(object):
     """
 
     def __init__(self, name, attributes, character_classes):
-        """Creates and actor using provided information
+        """Creates an actor using provided information
 
         Args:
             name (string): Name of the character used for display purposes only
@@ -36,6 +36,10 @@ class Actor(object):
         self.name = name
         self._character_classes = {}
         self._attributes = {}
+
+        # Initialize all attributes to ten
+        for attribute_name in Attribute.ABILITY_SCORE_NAMES:
+            self._attributes[attribute_name] = Attribute(attribute_name, 10)
 
         for attribute in attributes:
             if not isinstance(attribute, Attribute):
@@ -52,6 +56,13 @@ class Actor(object):
             SavingThrow.REFLEX: self._initialize_saving_throw(SavingThrow.REFLEX),
             SavingThrow.WILL: self._initialize_saving_throw(SavingThrow.WILL),
         }
+
+        self.basic_attack = Attack(
+            'base attack',
+            [self._attributes[Attribute.STRENGTH]],
+            [self._attributes[Attribute.STRENGTH]],
+            self._character_classes.values()
+        )
 
     def get_fortitude_save(self):
         """Returns the actor's fortitude saving throw including all temporary modifiers
@@ -99,8 +110,6 @@ class Actor(object):
         Returns:
             Int representing the raw ability score
         """
-        if attribute_name not in self._attributes:
-            raise ValueError(attribute_name + ' is not an attribute ' + self.name + ' possesses.')
         return self._attributes[attribute_name].score
 
     def _initialize_saving_throw(self, saving_throw_name):
@@ -120,9 +129,9 @@ class Actor(object):
 
     def get_base_attack_bonus(self):
         """Adds bonuses from all attached character classes to get total base attack"""
-        return Attack.get_base_attack_bonus(self._character_classes.values())
+        return self.basic_attack.get_base_attack_bonus()
 
-    def get_full_attack(self, attribute_names):
+    def get_full_attack(self):
         """Creates a list of attack modifiers using BAB to calculate multiple attacks then adding additional modifiers
         to each attack.
 
@@ -134,7 +143,4 @@ class Actor(object):
             list of Modifiers representing the modifier for each attack. See the first attack in the list for the
             full audit trail
         """
-        included_attributes = []
-        for attribute_name in attribute_names:
-            included_attributes.append(self._attributes[attribute_name])
-        return Attack.get_full_attacks(included_attributes, self._character_classes.values())
+        return self.basic_attack.get_full_attacks()
